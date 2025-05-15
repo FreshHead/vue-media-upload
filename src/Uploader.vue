@@ -154,16 +154,17 @@ export default {
         async fileChange(event) {
             this.isLoading = true
             let files = event.target.files
+            console.log({files})
 
             for (var i = 0; i < files.length; i++) {
                 if (!this.max || this.allMedia.length < this.max) {
                     if (files[i].size <= this.maxFilesize * 1000000) {
                         let formData = new FormData
                         let url = URL.createObjectURL(files[i])
-                        formData.set('image', files[i])
+                        formData.set('file', files[i])
 
                         const { data } = await axios.post(this.server, formData, this.config)
-                        let addedImage = { url: url, name: data.name, size: files[i].size, type: files[i].type }
+                        let addedImage = { url: url, name: files[i].name, size: files[i].size, type: files[i].type, data }
                         this.addedMedia.push(addedImage)
 
                         this.$emit('change', this.allMedia)
