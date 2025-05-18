@@ -32,7 +32,7 @@
                 <!--IMAGES PREVIEW-->
                 
                 <div v-for="(image, index) in savedMedia" :key="index" class="mu-image-container">
-                    <img :src="location +'/'+ image.name" alt=""  class="mu-images-preview">
+                    <img :src="image.url" alt=""  class="mu-images-preview">
                     <button @click="removeSavedMedia(index)" class="mu-close-btn" type="button">
                         <svg 
                             class='mu-times-icon' 
@@ -133,24 +133,42 @@ export default {
                 headers: null,
             },
 
-            isLoading: true
+            isLoading: false
         }
     },
     methods: {
         init() {
             this.savedMedia = this.media
             this.config.headers = this.headers
-
-            this.savedMedia.forEach((image, index) => {
+            this.savedMedia.forEach(async (image, index) => {
                 if (!this.savedMedia[index].url) {
-                    this.savedMedia[index].url = this.location + "/" + image.name
+                    const url = this.location + "/" + image.id;
+                    const { data } = await useFetch(url, { headers: this.headers });
+                    console.log({data: data.value})
+                    if(data.value){
+                        console.log({data: data.value})
+                        this.savedMedia[index].url = await this.getBase64Image(data.value)
+                    }
+                    console.log({url: this.savedMedia[index].url})
                 }
             });
 
-            setTimeout(() => this.isLoading = false, 1000)
+            this.isLoading = false;
 
             this.$emit('init', this.allMedia)
         },
+
+         async getBase64Image(blob) {
+            const reader = new FileReader();
+
+            await new Promise((resolve, reject) => {
+                reader.onload = resolve;
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+            return reader.result;
+        },
+
         async fileChange(event) {
             this.isLoading = true
             let files = event.target.files
