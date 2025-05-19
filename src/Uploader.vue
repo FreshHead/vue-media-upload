@@ -173,7 +173,6 @@ export default {
         async fileChange(event) {
             this.isLoading = true
             let files = event.target.files
-            console.log({files})
 
             for (var i = 0; i < files.length; i++) {
                 if (!this.max || this.allMedia.length < this.max) {
@@ -220,7 +219,7 @@ export default {
             this.$emit('change', this.allMedia)
             this.$emit('remove', removedImage, this.removedMedia)
         },
-        removeSavedMedia(index) {
+        async removeSavedMedia(index) {
             let removedImage = this.savedMedia[index]
             this.removedMedia.push(removedImage)
             this.savedMedia.splice(index, 1)
