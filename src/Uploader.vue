@@ -282,10 +282,10 @@ export default {
     background-color: #f1f1f1 !important;
 }
 .mu-plusbox:hover > .mu-plus-icon{
-    color: #028296 !important;
+    color: var(--ui-secondary) !important;
 }
 .mu-plus-icon{
-    color: #00afca !important;
+    color: var(--ui-primary) !important;
     font-size: 3rem !important;
     flex: 1;
 }
