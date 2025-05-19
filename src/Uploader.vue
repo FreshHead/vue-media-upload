@@ -144,12 +144,9 @@ export default {
                 if (!this.savedMedia[index].url) {
                     const url = this.location + "/" + image.id;
                     const { data } = await useFetch(url, { headers: this.headers });
-                    console.log({data: data.value})
                     if(data.value){
-                        console.log({data: data.value})
                         this.savedMedia[index].url = await this.getBase64Image(data.value)
                     }
-                    console.log({url: this.savedMedia[index].url})
                 }
             });
 
