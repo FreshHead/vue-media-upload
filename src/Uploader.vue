@@ -143,15 +143,19 @@ export default {
             this.savedMedia.forEach(async (image, index) => {
                 if (!this.savedMedia[index].url) {
                     const url = this.location + "/" + image.id;
-                    const { data } = await useFetch(url, { headers: this.headers });
-                    if(data.value){
-                        this.savedMedia[index].url = await this.getBase64Image(data.value)
+                    try{
+                        const { data } = await useFetch(url, { headers: this.headers });
+                        if(data.value){
+                            this.savedMedia[index].url = await this.getBase64Image(data.value)
+                        }
+
+                    }catch(e){
+                        console.error(e)
+                        // TODO: Выведи нотификацию о ошибке загрузки превью файла.
                     }
                 }
             });
-
             this.isLoading = false;
-
             this.$emit('init', this.allMedia)
         },
 
@@ -178,15 +182,21 @@ export default {
                         let url = URL.createObjectURL(files[i])
                         formData.set('file', files[i])
 
-                        const { data } = await axios.post(this.server, formData, this.config)
-                        let addedImage = { url: url, name: files[i].name, size: files[i].size, type: files[i].type, data }
-                        this.addedMedia.push(addedImage)
+                        try {
+                            const { data: id } = await axios.post(this.server, formData, this.config)
+                            let addedImage = { url: url, name: files[i].name, size: files[i].size, type: files[i].type, id }
+                            this.addedMedia.push(addedImage)
 
-                        this.$emit('change', this.allMedia)
-                        this.$emit('add', addedImage, this.addedMedia)
+                            this.$emit('change', this.allMedia)
+                            this.$emit('add', addedImage, this.addedMedia)
+                        }catch(e){
+                            console.error(e)
+                            // TODO: Выводи нотификацию о ошибке загрузки файла
+                        }
                     } else {
                         this.$emit('maxFilesize', files[i].size)
                         if (this.warnings) {
+                            // TODO: Нотификация вместо алерта
                             alert('The file you are trying to upload is too big. \nMaximum Filesize: ' + this.maxFilesize + 'MB')
                         }
                         break;
@@ -194,6 +204,7 @@ export default {
                 } else {
                     this.$emit('max')
                     if (this.warnings) {
+                        // TODO: Нотификация вместо алерта
                         alert('You have reached the maximum number of files that you can upload. \nMaximum Files: ' + this.max)
                     }
                     break;
@@ -242,10 +253,10 @@ export default {
 <style scoped>
 
 .mu-container{
-    background-color: #fbfbfb !important;
+    /* background-color: #fbfbfb !important; */
     border-radius: 5px !important;
-    border-style: solid !important;
-    border: 1px solid #9b9b9b !important;
+    /* border-style: solid !important; */
+    /* border: 1px solid #9b9b9b !important; */
     box-sizing: border-box !important;
     width: 100% !important;
     height: auto !important;
@@ -268,7 +279,7 @@ export default {
     margin: 0.25rem !important;
 }
 .mu-plusbox {
-    background-color: #ffffff !important;
+    /* background-color: #ffffff !important; */
     border: 1px dashed #818181 !important;
     border-radius: 5px !important;
     cursor: pointer !important;
@@ -308,17 +319,14 @@ export default {
     object-fit: cover;
     object-position: center;
 }
-.mu-images-preview:hover{
-    filter: brightness(90%);
-}
 
 .mu-close-btn{
     background: none !important;
-	color:white !important;
-	border: none !important;
-	padding: 0px !important;
+    color: var(--ui-secondary);
+    border: none !important;
+    padding: 0px !important;
     margin:0px !important;
-	cursor: pointer !important;
+    cursor: pointer !important;
 
     position: absolute !important;
     top: 0px;
